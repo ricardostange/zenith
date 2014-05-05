@@ -8,10 +8,11 @@
 #define PI 3.14159264
 #define TORAD 2*PI/360
 #define GM 398600.441
+#define EARTHRADIUS 6341.0
 
 using namespace std;
 
-float scale = 1;
+float scale = 1/EARTHRADIUS;
 
 typedef struct elements{
 	float e;	// Eccentricity [0,1)
@@ -20,7 +21,14 @@ typedef struct elements{
 	float omega;	// Longitude of the ascending node
 	float w;	// Argument of Periapsis
 	float m;	// Mean anomaly at epoch
+	float n0;	// Orbital period in revolutions per day
 }elements;
+
+double semimajorAxis(float orbitalPeriod){ // orbital period given in revolutions per day
+	double nSeconds = (1/orbitalPeriod)*24.0*60*60;	// number of seconds that each revolution takes
+	return(pow((nSeconds*nSeconds*GM)/(4*PI*PI), 1.0/3)); // terceira lei de kepler
+}
+
 
 vector<elements> orbits;
 
@@ -163,10 +171,11 @@ glColor3f(1.0, 0.0, 0.0);
 
 for(int i=0; i<orbits.size(); i++){
 	glBegin(GL_LINE_STRIP);
+		double sma =  semimajorAxis(orbits[i].n0);
 		for(float v = 0; v < 360; v++){
 			elements orb = orbits[i];
 			float u = 2*PI*(v+orb.w)/360;
-			float r = 1.0/(1+orb.e*cos(u))*scale;
+			float r = 1.0/(1+orb.e*cos(u))*scale*sma;
 			float x = r*((cos(u)*cos(orb.w*TORAD)-sin(u)*cos(orb.i*TORAD)*sin(orb.w*TORAD)));
 			float y = r*(cos(u)*sin(orb.w*TORAD)+sin(u)*cos(orb.i*TORAD)*cos(orb.w*TORAD));
 			float z = r*sin(u)*sin(orb.i*TORAD);
@@ -194,7 +203,7 @@ glEnd();
 /*  don't wait!  
  *   *  start processing buffered OpenGL routines 
  *    */
-    glutSolidSphere(0.5*scale, 20, 20);
+    glutSolidSphere(0.5*scale*EARTHRADIUS, 200, 200);
     glFlush ();
 }
 
@@ -230,6 +239,9 @@ void adicionarOrbita(){
 	scanf("%f", &ele.i);
 	printf("Digite o argumento da periapsis: ", &ele.w);
 	scanf("%f", &ele.w);
+	printf("Digite o numero de revolucoes por dia", &ele.n0);
+	scanf("%f", &ele.n0);
+
 	orbits.push_back(ele);
 	glutPostRedisplay();
 }
