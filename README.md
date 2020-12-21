@@ -1,4 +1,4 @@
-This is a free mission analysis software. Or will be.
+This was an attempt to make a 3D tool to visualize satelites around Earth. It is unfinished.
 
 How to run: type "make run".
 
@@ -7,4 +7,3 @@ Use 'q','w','e','a','s','d' to navigate.
 'i' to add a new orbit from elements.
 
 
-Edit: This was an attempt to make a 3D tool to visualize satelites around Earth.
